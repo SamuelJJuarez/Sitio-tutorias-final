@@ -29,7 +29,7 @@ const DetalleResumenAdminModal = ({ modalData, onClose }) => {
               return (
                 <div key={preg.id_pregunta} className="bg-white p-4 rounded border shadow-sm mb-4">
                     <h6 className="fw-bold text-dark border-bottom pb-2 mb-3">
-                        {idx + 1}. {preg.pregunta}
+                        {preg.pregunta}
                     </h6>
                     <ul className="list-group list-group-flush">
                         {opcionesMostrar.map((op, i) => (

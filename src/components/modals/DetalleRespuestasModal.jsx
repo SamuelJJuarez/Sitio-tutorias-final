@@ -16,7 +16,7 @@ const DetalleRespuestasModal = ({ modalData, onClose }) => {
               {modalData.respuestas && modalData.respuestas.map((resp, idx) => (
                 <div key={resp.id_pregunta} className={`d-flex flex-column ${idx !== modalData.respuestas.length - 1 ? 'border-bottom mb-3 pb-3' : ''}`}>
                   <span className="fw-semibold text-secondary mb-1">
-                    {idx + 1}. {resp.pregunta}
+                    {resp.pregunta}
                   </span>
                   <span className="text-tec fw-bold">
                     <i className="bi bi-check-circle-fill me-2 text-success"></i> 
