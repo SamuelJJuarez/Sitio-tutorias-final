@@ -103,17 +103,38 @@ const CuestionarioPage = () => {
   const renderOpcionesPregunta = (preg) => {
     const valorActual = respuestasUsuario[preg.id_pregunta];
 
+    // Checar condicionales para deshabilitar preguntas específicas
+    let isDisabled = false;
+    let placeholderMsg = "Escribe tu respuesta...";
+    
+    if (preg.pregunta.startsWith('49.')) {
+      const preg48 = preguntas.find(p => p.pregunta.startsWith('48.'));
+      const resp48 = preg48 ? respuestasUsuario[preg48.id_pregunta] : null;
+      const isSi = preg48 && preg48.opciones.find(o => o.id_opcion === resp48)?.opcion === 'Sí';
+      isDisabled = !isSi;
+      if (isDisabled) placeholderMsg = "Solo aplica si contestaste 'Sí' a la pregunta 48.";
+    }
+    
+    if (preg.pregunta.startsWith('51.')) {
+      const preg50 = preguntas.find(p => p.pregunta.startsWith('50.'));
+      const resp50 = preg50 ? respuestasUsuario[preg50.id_pregunta] : null;
+      const isSi = preg50 && preg50.opciones.find(o => o.id_opcion === resp50)?.opcion === 'Sí';
+      isDisabled = !isSi;
+      if (isDisabled) placeholderMsg = "Solo aplica si contestaste 'Sí' a la pregunta 50.";
+    }
+
     switch (preg.tipo_resp) {
       case 'Abierta_Corta':
         return (
           <div className="col-12 col-md-8">
             <input
               type="text"
-              className="form-control form-control-lg shadow-sm border-primary"
+              className={`form-control form-control-lg shadow-sm ${isDisabled ? 'bg-light text-muted' : 'border-primary'}`}
               maxLength={40}
               value={valorActual || ''}
               onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
-              placeholder="Escribe tu respuesta..."
+              placeholder={placeholderMsg}
+              disabled={isDisabled}
             />
           </div>
         );
@@ -121,12 +142,13 @@ const CuestionarioPage = () => {
         return (
           <div className="col-12">
             <textarea
-              className="form-control form-control-lg shadow-sm border-primary"
+              className={`form-control form-control-lg shadow-sm ${isDisabled ? 'bg-light text-muted' : 'border-primary'}`}
               maxLength={80}
               rows={3}
               value={valorActual || ''}
               onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
-              placeholder="Escribe tu respuesta..."
+              placeholder={placeholderMsg}
+              disabled={isDisabled}
             ></textarea>
           </div>
         );
@@ -135,9 +157,10 @@ const CuestionarioPage = () => {
           <div className="col-12 col-md-6 col-lg-4">
             <input
               type="date"
-              className="form-control form-control-lg shadow-sm border-primary"
+              className={`form-control form-control-lg shadow-sm ${isDisabled ? 'bg-light text-muted' : 'border-primary'}`}
               value={valorActual || ''}
               onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
+              disabled={isDisabled}
             />
           </div>
         );
@@ -145,9 +168,10 @@ const CuestionarioPage = () => {
         return (
           <div className="col-12 col-md-6 col-lg-4">
             <select
-              className="form-select form-select-lg shadow-sm border-primary"
+              className={`form-select form-select-lg shadow-sm ${isDisabled ? 'bg-light text-muted' : 'border-primary'}`}
               value={valorActual || ""}
               onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value ? parseInt(e.target.value, 10) : null)}
+              disabled={isDisabled}
             >
               <option value="">-- Selecciona --</option>
               {preg.opciones && preg.opciones.map((op) => (
@@ -171,6 +195,7 @@ const CuestionarioPage = () => {
                     id={`opt_${op.id_opcion}`}
                     onChange={(e) => handleMultipleSelect(preg.id_pregunta, op.id_opcion, e.target.checked)}
                     checked={isChecked}
+                    disabled={isDisabled}
                   />
                   <label className="form-check-label w-100 cursor-pointer" htmlFor={`opt_${op.id_opcion}`}>
                     {op.opcion}
@@ -193,6 +218,7 @@ const CuestionarioPage = () => {
                   id={`opt_${op.id_opcion}`}
                   onChange={() => handleOptionSelect(preg.id_pregunta, op.id_opcion)}
                   checked={valorActual === op.id_opcion}
+                  disabled={isDisabled}
                 />
                 <label className="form-check-label w-100 cursor-pointer" htmlFor={`opt_${op.id_opcion}`}>
                   {op.opcion}
@@ -204,20 +230,65 @@ const CuestionarioPage = () => {
     }
   };
 
-  // Verificar si todas las preguntas tienen respuesta
+  // Verificar si todas las preguntas obligatorias tienen respuesta
   const validarAvance = () => {
-    // Revisamos si el número de respuestas guardadas coincide con el número de preguntas
     if (preguntas.length === 0) return false;
-    return Object.keys(respuestasUsuario).length === preguntas.length;
+    
+    // Identificar preguntas condicionales de la sección 4
+    const preg48 = preguntas.find(p => p.pregunta.startsWith('48.'));
+    const resp48 = preg48 ? respuestasUsuario[preg48.id_pregunta] : null;
+    const isSi48 = preg48 && preg48.opciones.find(o => o.id_opcion === resp48)?.opcion === 'Sí';
+
+    const preg50 = preguntas.find(p => p.pregunta.startsWith('50.'));
+    const resp50 = preg50 ? respuestasUsuario[preg50.id_pregunta] : null;
+    const isSi50 = preg50 && preg50.opciones.find(o => o.id_opcion === resp50)?.opcion === 'Sí';
+
+    const preg49 = preguntas.find(p => p.pregunta.startsWith('49.'));
+    const preg51 = preguntas.find(p => p.pregunta.startsWith('51.'));
+
+    let preguntasObligatorias = preguntas.length;
+    if (preg49 && !isSi48) preguntasObligatorias--;
+    if (preg51 && !isSi50) preguntasObligatorias--;
+
+    let respuestasValidas = 0;
+    for (const preg of preguntas) {
+      if (preg.id_pregunta === preg49?.id_pregunta && !isSi48) continue;
+      if (preg.id_pregunta === preg51?.id_pregunta && !isSi50) continue;
+      
+      if (respuestasUsuario[preg.id_pregunta] !== undefined) {
+        respuestasValidas++;
+      }
+    }
+
+    return respuestasValidas === preguntasObligatorias;
   };
 
   // Enviar sección y pasar a la siguiente
   const handleSiguiente = async () => {
     if (!validarAvance()) return;
 
+    // Antes de guardar, limpiamos las respuestas de las preguntas condicionales que se deshabilitaron
+    const respuestasFinales = { ...respuestasUsuario };
+    
+    const preg48 = preguntas.find(p => p.pregunta.startsWith('48.'));
+    const preg49 = preguntas.find(p => p.pregunta.startsWith('49.'));
+    if (preg48 && preg49) {
+      const resp48 = respuestasFinales[preg48.id_pregunta];
+      const isSi48 = preg48.opciones.find(o => o.id_opcion === resp48)?.opcion === 'Sí';
+      if (!isSi48) delete respuestasFinales[preg49.id_pregunta];
+    }
+
+    const preg50 = preguntas.find(p => p.pregunta.startsWith('50.'));
+    const preg51 = preguntas.find(p => p.pregunta.startsWith('51.'));
+    if (preg50 && preg51) {
+      const resp50 = respuestasFinales[preg50.id_pregunta];
+      const isSi50 = preg50.opciones.find(o => o.id_opcion === resp50)?.opcion === 'Sí';
+      if (!isSi50) delete respuestasFinales[preg51.id_pregunta];
+    }
+
     try {
       // Convertimos el objeto de respuestas a un array de detalle
-      const respuestasDetalle = Object.entries(respuestasUsuario).map(([id_pregunta, valor]) => ({
+      const respuestasDetalle = Object.entries(respuestasFinales).map(([id_pregunta, valor]) => ({
         id_pregunta: parseInt(id_pregunta),
         valor: valor
       }));
