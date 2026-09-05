@@ -90,9 +90,9 @@ const CuestionarioPage = () => {
       } else {
         const filtradas = actuales.filter(v => v !== idOpcion);
         if (filtradas.length > 0) {
-           updated[idPregunta] = filtradas;
+          updated[idPregunta] = filtradas;
         } else {
-           delete updated[idPregunta];
+          delete updated[idPregunta];
         }
       }
       return updated;
@@ -107,8 +107,8 @@ const CuestionarioPage = () => {
       case 'Abierta_Corta':
         return (
           <div className="col-12 col-md-8">
-            <input 
-              type="text" 
+            <input
+              type="text"
               className="form-control form-control-lg shadow-sm border-primary"
               maxLength={40}
               value={valorActual || ''}
@@ -120,7 +120,7 @@ const CuestionarioPage = () => {
       case 'Abierta_Larga':
         return (
           <div className="col-12">
-            <textarea 
+            <textarea
               className="form-control form-control-lg shadow-sm border-primary"
               maxLength={80}
               rows={3}
@@ -133,8 +133,8 @@ const CuestionarioPage = () => {
       case 'Fecha':
         return (
           <div className="col-12 col-md-6 col-lg-4">
-            <input 
-              type="date" 
+            <input
+              type="date"
               className="form-control form-control-lg shadow-sm border-primary"
               value={valorActual || ''}
               onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
@@ -267,7 +267,7 @@ const CuestionarioPage = () => {
           <div className="card-body p-5">
             {preguntas.map((preg, index) => (
               <div key={preg.id_pregunta} className="mb-5 border-bottom pb-4">
-                <h5 className="fw-bold mb-3">{index + 1}. {preg.pregunta}</h5>
+                <h5 className="fw-bold mb-3">{preg.pregunta}</h5>
                 {renderOpcionesPregunta(preg)}
               </div>
             ))}
