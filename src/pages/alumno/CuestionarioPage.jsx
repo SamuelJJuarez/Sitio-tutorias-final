@@ -69,11 +69,11 @@ const CuestionarioPage = () => {
   }, [indiceSeccionActual, secciones]);
 
   // Manejar selección de opción
-  const handleOptionSelect = (idPregunta, idOpcion) => {
+  const handleOptionSelect = (idPregunta, valor) => {
     setRespuestasUsuario(prev => {
       const updated = { ...prev };
-      if (idOpcion) {
-        updated[idPregunta] = idOpcion;
+      if (valor !== null && valor !== "" && (Array.isArray(valor) ? valor.length > 0 : true)) {
+        updated[idPregunta] = valor;
       } else {
         delete updated[idPregunta];
       }
@@ -81,77 +81,127 @@ const CuestionarioPage = () => {
     });
   };
 
+  const handleMultipleSelect = (idPregunta, idOpcion, isChecked) => {
+    setRespuestasUsuario(prev => {
+      const updated = { ...prev };
+      const actuales = updated[idPregunta] || [];
+      if (isChecked) {
+        updated[idPregunta] = [...actuales, idOpcion];
+      } else {
+        const filtradas = actuales.filter(v => v !== idOpcion);
+        if (filtradas.length > 0) {
+           updated[idPregunta] = filtradas;
+        } else {
+           delete updated[idPregunta];
+        }
+      }
+      return updated;
+    });
+  };
+
   // Renderizado dinámico según el tipo de pregunta
   const renderOpcionesPregunta = (preg) => {
-    const currentYear = new Date().getFullYear();
+    const valorActual = respuestasUsuario[preg.id_pregunta];
 
-    // 1. Pregunta 21: Año en el que cursó la última materia (Dropdown dinámico hasta el año en curso)
-    if (preg.id_pregunta === 21) {
-      const opcionesFiltradas = (preg.opciones || [])
-        .filter((op) => {
-          const year = parseInt(op.opcion, 10);
-          return !isNaN(year) && year <= currentYear;
-        })
-        .sort((a, b) => parseInt(b.opcion, 10) - parseInt(a.opcion, 10)); // Año más reciente primero
-
-      return (
-        <div className="col-12 col-md-6 col-lg-4">
-          <select
-            className="form-select form-select-lg shadow-sm border-primary"
-            value={respuestasUsuario[preg.id_pregunta] || ""}
-            onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value ? parseInt(e.target.value, 10) : null)}
-          >
-            <option value="">-- Selecciona el año --</option>
-            {opcionesFiltradas.map((op) => (
-              <option key={op.id_opcion} value={op.id_opcion}>
-                {op.opcion}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    }
-
-    // 2. Pregunta 27: Promedio (Dropdown compacto 6.0 a 10.0)
-    if (preg.id_pregunta === 27) {
-      return (
-        <div className="col-12 col-md-6 col-lg-4">
-          <select
-            className="form-select form-select-lg shadow-sm border-primary"
-            value={respuestasUsuario[preg.id_pregunta] || ""}
-            onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value ? parseInt(e.target.value, 10) : null)}
-          >
-            <option value="">-- Selecciona tu promedio --</option>
-            {preg.opciones && preg.opciones.map((op) => (
-              <option key={op.id_opcion} value={op.id_opcion}>
-                {op.opcion}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    }
-
-    // 3. Preguntas estándar con Radio Buttons
-    return (
-      <div className="d-flex flex-column gap-2">
-        {preg.opciones && preg.opciones.map((op) => (
-          <div key={op.id_opcion} className="form-check p-2 rounded hover-bg-light">
-            <input
-              className="form-check-input"
-              type="radio"
-              name={`preg_${preg.id_pregunta}`}
-              id={`opt_${op.id_opcion}`}
-              onChange={() => handleOptionSelect(preg.id_pregunta, op.id_opcion)}
-              checked={respuestasUsuario[preg.id_pregunta] === op.id_opcion}
+    switch (preg.tipo_resp) {
+      case 'Abierta_Corta':
+        return (
+          <div className="col-12 col-md-8">
+            <input 
+              type="text" 
+              className="form-control form-control-lg shadow-sm border-primary"
+              maxLength={40}
+              value={valorActual || ''}
+              onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
+              placeholder="Escribe tu respuesta..."
             />
-            <label className="form-check-label w-100 cursor-pointer" htmlFor={`opt_${op.id_opcion}`}>
-              {op.opcion}
-            </label>
           </div>
-        ))}
-      </div>
-    );
+        );
+      case 'Abierta_Larga':
+        return (
+          <div className="col-12">
+            <textarea 
+              className="form-control form-control-lg shadow-sm border-primary"
+              maxLength={80}
+              rows={3}
+              value={valorActual || ''}
+              onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
+              placeholder="Escribe tu respuesta..."
+            ></textarea>
+          </div>
+        );
+      case 'Fecha':
+        return (
+          <div className="col-12 col-md-6 col-lg-4">
+            <input 
+              type="date" 
+              className="form-control form-control-lg shadow-sm border-primary"
+              value={valorActual || ''}
+              onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
+            />
+          </div>
+        );
+      case 'Scroll':
+        return (
+          <div className="col-12 col-md-6 col-lg-4">
+            <select
+              className="form-select form-select-lg shadow-sm border-primary"
+              value={valorActual || ""}
+              onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value ? parseInt(e.target.value, 10) : null)}
+            >
+              <option value="">-- Selecciona --</option>
+              {preg.opciones && preg.opciones.map((op) => (
+                <option key={op.id_opcion} value={op.id_opcion}>
+                  {op.opcion}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      case 'Multiple':
+        return (
+          <div className="d-flex flex-column gap-2">
+            {preg.opciones && preg.opciones.map((op) => {
+              const isChecked = Array.isArray(valorActual) && valorActual.includes(op.id_opcion);
+              return (
+                <div key={op.id_opcion} className="form-check p-2 rounded hover-bg-light">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id={`opt_${op.id_opcion}`}
+                    onChange={(e) => handleMultipleSelect(preg.id_pregunta, op.id_opcion, e.target.checked)}
+                    checked={isChecked}
+                  />
+                  <label className="form-check-label w-100 cursor-pointer" htmlFor={`opt_${op.id_opcion}`}>
+                    {op.opcion}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        );
+      case 'Cerrada':
+      default:
+        return (
+          <div className="d-flex flex-column gap-2">
+            {preg.opciones && preg.opciones.map((op) => (
+              <div key={op.id_opcion} className="form-check p-2 rounded hover-bg-light">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name={`preg_${preg.id_pregunta}`}
+                  id={`opt_${op.id_opcion}`}
+                  onChange={() => handleOptionSelect(preg.id_pregunta, op.id_opcion)}
+                  checked={valorActual === op.id_opcion}
+                />
+                <label className="form-check-label w-100 cursor-pointer" htmlFor={`opt_${op.id_opcion}`}>
+                  {op.opcion}
+                </label>
+              </div>
+            ))}
+          </div>
+        );
+    }
   };
 
   // Verificar si todas las preguntas tienen respuesta
@@ -167,9 +217,9 @@ const CuestionarioPage = () => {
 
     try {
       // Convertimos el objeto de respuestas a un array de detalle
-      const respuestasDetalle = Object.entries(respuestasUsuario).map(([id_pregunta, id_opcion]) => ({
+      const respuestasDetalle = Object.entries(respuestasUsuario).map(([id_pregunta, valor]) => ({
         id_pregunta: parseInt(id_pregunta),
-        id_opcion: parseInt(id_opcion)
+        valor: valor
       }));
 
       await cuestionarioService.saveSeccion({
