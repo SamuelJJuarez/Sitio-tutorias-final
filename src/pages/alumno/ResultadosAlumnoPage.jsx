@@ -18,7 +18,12 @@ const ResultadosAlumnoPage = () => {
     
     const groups = {};
     cerradas.forEach(r => {
-      const key = JSON.stringify(r.opciones_posibles || []);
+      // Extraemos el número base de la pregunta (ej. "43" de "43.1", o "61" de "61.")
+      const match = r.pregunta.match(/^(\d+)/);
+      const baseNum = match ? match[1] : r.id_pregunta;
+      
+      const key = baseNum + "-" + JSON.stringify(r.opciones_posibles || []);
+      
       if (!groups[key]) groups[key] = { opciones: r.opciones_posibles || [], preguntas: [] };
       groups[key].preguntas.push(r);
     });
