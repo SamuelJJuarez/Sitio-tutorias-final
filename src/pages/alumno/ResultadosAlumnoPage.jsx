@@ -52,6 +52,13 @@ const ResultadosAlumnoPage = () => {
         let label = "Preguntas agrupadas";
         if (nums.length > 0) {
            label = `Preguntas ${nums[0]} a ${nums[nums.length-1]}`;
+           
+           // Extraer el texto base de la primera pregunta para dar contexto
+           const firstPregunta = group.preguntas[0].pregunta;
+           const titleMatch = firstPregunta.match(/^\d+(?:\.\d+)?\s*(.*?)\s*(?:-|$)/);
+           if (titleMatch && titleMatch[1]) {
+             label += ` - ${titleMatch[1].trim()}`;
+           }
         }
         
         charts.push({
