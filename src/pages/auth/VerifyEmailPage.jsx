@@ -15,7 +15,7 @@ const VerifyEmailPage = () => {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(`https://api-sitio-tutorias.vercel.app/api/verificacion/verificar`, {
+        const response = await fetch(`https://apitutoriasitl.vercel.app/api/verificacion/verificar`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

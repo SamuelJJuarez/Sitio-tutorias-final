@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import logo from '../../assets/itl_leon.png';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUserTie, FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
 
-const API_URL = 'https://api-sitio-tutorias.vercel.app/api/verificacion';
+const API_URL = 'https://apitutoriasitl.vercel.app/api/verificacion';
 
 const ResponderEntrevistaPage = () => {
   const [searchParams] = useSearchParams();
@@ -91,7 +91,7 @@ const ResponderEntrevistaPage = () => {
   return (
     <div className="bg-tec-full min-vh-100 p-3 d-flex align-items-center justify-content-center">
       <div className="card shadow-lg border-0 rounded-4 p-4 p-md-5 bg-white" style={{ maxWidth: '560px', width: '100%' }}>
-        
+
         {/* Encabezado con Logo */}
         <div className="text-center mb-4">
           <img src={logo} alt="Logo ITL" style={{ width: '75px', marginBottom: '10px' }} />
@@ -182,7 +182,7 @@ const ResponderEntrevistaPage = () => {
         {!loading && !error && !respuestaEstado && entrevista && (
           <div>
             <h5 className="fw-bold text-center text-dark mb-3">Respuesta a Entrevista de Tutoría</h5>
-            
+
             {/* Tarjeta de Resumen de la Cita */}
             <div className="bg-light p-3 rounded-3 mb-4 border">
               <div className="mb-2">
@@ -232,8 +232,8 @@ const ResponderEntrevistaPage = () => {
                   <p className="text-secondary small">
                     Al confirmar, se enviará una notificación a tu tutor indicando que asistirás puntualmente a la cita.
                   </p>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-success w-100 py-2 fs-6 fw-bold shadow-sm"
                     disabled={isSubmitting}
                   >
@@ -256,8 +256,8 @@ const ResponderEntrevistaPage = () => {
                   <small className="text-muted d-block mt-1">
                     Esta justificación le llegará a tu profesor para que pueda reprogramar la cita.
                   </small>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-danger w-100 py-2 fs-6 fw-bold shadow-sm mt-3"
                     disabled={isSubmitting}
                   >

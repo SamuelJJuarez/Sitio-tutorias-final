@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // URL base de la API
-  const API_URL = 'https://api-sitio-tutorias.vercel.app/api';
+  const API_URL = 'https://apitutoriasitl.vercel.app/api';
 
   // Efecto para verificar si ya hay sesión al recargar la página
   useEffect(() => {

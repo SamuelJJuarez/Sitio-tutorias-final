@@ -114,7 +114,7 @@ const RegisterAlumnoPage = () => {
           }
 
           try {
-            const statusRes = await fetch(`https://api-sitio-tutorias.vercel.app/api/verificacion/status/${registroId}`);
+            const statusRes = await fetch(`https://apitutoriasitl.vercel.app/api/verificacion/status/${registroId}`);
             const statusData = await statusRes.json();
 
             if (statusData.success && statusData.status === 'verified') {
@@ -234,7 +234,6 @@ const RegisterAlumnoPage = () => {
                     <select name="indice_grupo" className="form-select" onChange={handleChange} required>
                       <option value="">Seleccione...</option>
                       {grupos.map((g) => (
-                        // Asumiendo que tu API devuelve indice_grupo y letra_grupo
                         <option key={g.indice_grupo} value={g.indice_grupo}>
                           {g.letra_grupo} ({g.periodo})
                         </option>

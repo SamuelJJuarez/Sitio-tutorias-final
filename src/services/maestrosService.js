@@ -1,5 +1,5 @@
-const API_URL = 'https://api-sitio-tutorias.vercel.app/api/maestros';
-const CUESTIONARIO_URL = 'https://api-sitio-tutorias.vercel.app/api/cuestionario';
+const API_URL = 'https://apitutoriasitl.vercel.app/api/maestros';
+const CUESTIONARIO_URL = 'https://apitutoriasitl.vercel.app/api/cuestionario';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
