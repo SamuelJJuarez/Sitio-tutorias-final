@@ -13,17 +13,51 @@ const ResultadosAlumnoPage = () => {
   const [resultados, setResultados] = useState([]);
   const [modalData, setModalData] = useState(null);
 
-  const getChartData = (respuestas) => {
-    const counts = {};
-    respuestas.forEach(r => {
-      if (r.respuesta_elegida && r.respuesta_elegida !== "Sin responder") {
-        counts[r.respuesta_elegida] = (counts[r.respuesta_elegida] || 0) + 1;
+  const getGroupedChartData = (respuestas) => {
+    const cerradas = respuestas.filter(r => r.tipo_resp === 'Cerrada');
+    
+    const groups = {};
+    cerradas.forEach(r => {
+      const key = JSON.stringify(r.opciones_posibles || []);
+      if (!groups[key]) groups[key] = { opciones: r.opciones_posibles || [], preguntas: [] };
+      groups[key].preguntas.push(r);
+    });
+
+    const charts = [];
+    Object.values(groups).forEach(group => {
+      if (group.preguntas.length >= 2) {
+        const counts = {};
+        group.preguntas.forEach(r => {
+          if (r.respuesta_elegida && r.respuesta_elegida !== "Sin responder") {
+            counts[r.respuesta_elegida] = (counts[r.respuesta_elegida] || 0) + 1;
+          }
+        });
+        
+        const chartData = Object.keys(counts).map(key => ({
+          name: key,
+          cantidad: counts[key]
+        }));
+        
+        const regex = /^(\d+(\.\d+)?)/;
+        const nums = group.preguntas.map(p => {
+          const match = p.pregunta.match(regex);
+          return match ? match[1] : null;
+        }).filter(n => n !== null);
+        
+        let label = "Preguntas agrupadas";
+        if (nums.length > 0) {
+           label = `Preguntas ${nums[0]} a ${nums[nums.length-1]}`;
+        }
+        
+        charts.push({
+          label,
+          opcionesTexto: group.opciones.join(' / '),
+          data: chartData
+        });
       }
     });
-    return Object.keys(counts).map(key => ({
-      name: key,
-      cantidad: counts[key]
-    }));
+    
+    return charts;
   };
 
   useEffect(() => {
@@ -77,8 +111,7 @@ const ResultadosAlumnoPage = () => {
 
             <div className="row g-4">
               {resultados.map((seccion) => {
-                const showChart = seccion.id_seccion !== 2 && seccion.id_seccion !== 3;
-                const chartData = showChart ? getChartData(seccion.respuestas || []) : [];
+                const charts = getGroupedChartData(seccion.respuestas || []);
 
                 return (
                   <div key={seccion.id_seccion} className="col-12 mb-5">
@@ -86,23 +119,29 @@ const ResultadosAlumnoPage = () => {
                       {seccion.nombre}
                     </h5>
 
-                    {showChart && (
-                      <div className="bg-white p-3 rounded border shadow-sm mb-3" style={{ height: 350 }}>
-                        <ResponsiveContainer>
-                          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" />
-                            <YAxis allowDecimals={false} />
-                            <Tooltip cursor={{ fill: '#f0f0f0' }} />
-                            <Bar dataKey="cantidad" name="Respuestas" radius={[4, 4, 0, 0]}>
-                              {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
+                    {charts.map((chart, idx) => (
+                      <div key={idx} className="bg-white p-4 rounded border shadow-sm mb-4">
+                        <div className="mb-4 text-center border-bottom pb-2">
+                          <h6 className="fw-bold text-primary mb-1">{chart.label}</h6>
+                          <small className="text-muted">Opciones evaluadas: {chart.opcionesTexto}</small>
+                        </div>
+                        <div style={{ height: 350 }}>
+                          <ResponsiveContainer>
+                            <BarChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                              <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" />
+                              <YAxis allowDecimals={false} />
+                              <Tooltip cursor={{ fill: '#f0f0f0' }} />
+                              <Bar dataKey="cantidad" name="Respuestas" radius={[4, 4, 0, 0]}>
+                                {chart.data.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
-                    )}
+                    ))}
 
                     <div>
                       <button

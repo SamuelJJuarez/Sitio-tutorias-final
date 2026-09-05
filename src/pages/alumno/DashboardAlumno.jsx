@@ -62,7 +62,7 @@ const DashboardAlumno = () => {
       <div className="row g-5 justify-content-center w-100" style={{ maxWidth: '900px' }}>
         {/* Tarjeta Examen */}
         <div className="col-md-5">
-          <div 
+          <div
             className="card shadow h-100 text-center p-4 card-custom cursor-pointer zoom-effect border-0"
             role="button"
             tabIndex={0}
@@ -71,7 +71,7 @@ const DashboardAlumno = () => {
           >
             <div className="card-body">
               <FaClipboardList className="display-1 text-primary mb-3" size={80} />
-              <h3 className="card-title fw-bold text-dark">Realizar examen</h3>
+              <h3 className="card-title fw-bold text-dark">Realizar cuestionario inicial</h3>
               <p className="card-text text-muted">Contesta el cuestionario de tutorías.</p>
             </div>
           </div>
@@ -79,7 +79,7 @@ const DashboardAlumno = () => {
 
         {/* Tarjeta Resultados */}
         <div className="col-md-5">
-          <div 
+          <div
             className="card shadow h-100 text-center p-4 card-custom cursor-pointer zoom-effect border-0"
             role="button"
             tabIndex={0}
@@ -88,8 +88,8 @@ const DashboardAlumno = () => {
           >
             <div className="card-body">
               <FaChartBar className="display-1 text-success mb-3" size={80} />
-              <h3 className="card-title fw-bold text-dark">Ver resultados</h3>
-              <p className="card-text text-muted">Consulta tu diagnóstico.</p>
+              <h3 className="card-title fw-bold text-dark">Ver diagnóstico</h3>
+              <p className="card-text text-muted">Consulta tus respuestas al cuestionario.</p>
             </div>
           </div>
         </div>

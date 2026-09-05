@@ -106,7 +106,7 @@ const CuestionarioPage = () => {
     // Checar condicionales para deshabilitar preguntas específicas
     let isDisabled = false;
     let placeholderMsg = "Escribe tu respuesta...";
-    
+
     if (preg.pregunta.startsWith('49.')) {
       const preg48 = preguntas.find(p => p.pregunta.startsWith('48.'));
       const resp48 = preg48 ? respuestasUsuario[preg48.id_pregunta] : null;
@@ -114,7 +114,7 @@ const CuestionarioPage = () => {
       isDisabled = !isSi;
       if (isDisabled) placeholderMsg = "Solo aplica si contestaste 'Sí' a la pregunta 48.";
     }
-    
+
     if (preg.pregunta.startsWith('51.')) {
       const preg50 = preguntas.find(p => p.pregunta.startsWith('50.'));
       const resp50 = preg50 ? respuestasUsuario[preg50.id_pregunta] : null;
@@ -143,7 +143,7 @@ const CuestionarioPage = () => {
           <div className="col-12">
             <textarea
               className={`form-control form-control-lg shadow-sm ${isDisabled ? 'bg-light text-muted' : 'border-primary'}`}
-              maxLength={80}
+              maxLength={200}
               rows={3}
               value={valorActual || ''}
               onChange={(e) => handleOptionSelect(preg.id_pregunta, e.target.value)}
@@ -233,7 +233,7 @@ const CuestionarioPage = () => {
   // Verificar si todas las preguntas obligatorias tienen respuesta
   const validarAvance = () => {
     if (preguntas.length === 0) return false;
-    
+
     // Identificar preguntas condicionales de la sección 4
     const preg48 = preguntas.find(p => p.pregunta.startsWith('48.'));
     const resp48 = preg48 ? respuestasUsuario[preg48.id_pregunta] : null;
@@ -254,7 +254,7 @@ const CuestionarioPage = () => {
     for (const preg of preguntas) {
       if (preg.id_pregunta === preg49?.id_pregunta && !isSi48) continue;
       if (preg.id_pregunta === preg51?.id_pregunta && !isSi50) continue;
-      
+
       if (respuestasUsuario[preg.id_pregunta] !== undefined) {
         respuestasValidas++;
       }
@@ -269,7 +269,7 @@ const CuestionarioPage = () => {
 
     // Antes de guardar, limpiamos las respuestas de las preguntas condicionales que se deshabilitaron
     const respuestasFinales = { ...respuestasUsuario };
-    
+
     const preg48 = preguntas.find(p => p.pregunta.startsWith('48.'));
     const preg49 = preguntas.find(p => p.pregunta.startsWith('49.'));
     if (preg48 && preg49) {
