@@ -4,6 +4,7 @@ import { maestrosService } from '../../services/maestrosService';
 import logo from '../../assets/itl_leon.png';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import DetalleRespuestasModal from '../../components/modals/DetalleRespuestasModal';
+import { IoArrowBackCircleSharp } from 'react-icons/io5';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 const ResultadosAlumnoVista = () => {
@@ -15,14 +16,14 @@ const ResultadosAlumnoVista = () => {
 
   const getGroupedChartData = (respuestas) => {
     const cerradas = respuestas.filter(r => r.tipo_resp === 'Cerrada');
-    
+
     const groups = {};
     cerradas.forEach(r => {
       const match = r.pregunta.match(/^(\d+)/);
       const baseNum = match ? match[1] : r.id_pregunta;
-      
+
       const key = baseNum + "-" + JSON.stringify(r.opciones_posibles || []);
-      
+
       if (!groups[key]) groups[key] = { opciones: r.opciones_posibles || [], preguntas: [] };
       groups[key].preguntas.push(r);
     });
@@ -36,29 +37,29 @@ const ResultadosAlumnoVista = () => {
             counts[r.respuesta_elegida] = (counts[r.respuesta_elegida] || 0) + 1;
           }
         });
-        
+
         const chartData = Object.keys(counts).map(key => ({
           name: key,
           cantidad: counts[key]
         }));
-        
+
         const regex = /^(\d+(\.\d+)?)/;
         const nums = group.preguntas.map(p => {
           const match = p.pregunta.match(regex);
           return match ? match[1] : null;
         }).filter(n => n !== null);
-        
+
         let label = "Preguntas agrupadas";
         if (nums.length > 0) {
-           label = `Preguntas ${nums[0]} a ${nums[nums.length-1]}`;
-           
-           const firstPregunta = group.preguntas[0].pregunta;
-           const titleMatch = firstPregunta.match(/^\d+(?:\.\d+)?\s*(.*?)\s*(?:-|$)/);
-           if (titleMatch && titleMatch[1]) {
-             label += ` - ${titleMatch[1].trim()}`;
-           }
+          label = `Preguntas ${nums[0]} a ${nums[nums.length - 1]}`;
+
+          const firstPregunta = group.preguntas[0].pregunta;
+          const titleMatch = firstPregunta.match(/^\d+(?:\.\d+)?\s*(.*?)\s*(?:-|$)/);
+          if (titleMatch && titleMatch[1]) {
+            label += ` - ${titleMatch[1].trim()}`;
+          }
         }
-        
+
         charts.push({
           label,
           opcionesTexto: group.opciones.join(' / '),
@@ -66,7 +67,7 @@ const ResultadosAlumnoVista = () => {
         });
       }
     });
-    
+
     return charts;
   };
 
@@ -94,7 +95,9 @@ const ResultadosAlumnoVista = () => {
                 <small className="text-muted">{num_control}</small>
               </div>
             </div>
-            <button className="btn border-0 bg-transparent text-tec d-flex align-items-center gap-2" onClick={() => navigate(-1)}>Regresar</button>
+            <button className="btn border-0 bg-transparent text-tec d-flex align-items-center gap-2" onClick={() => navigate('/maestro/dashboard')}>
+              <IoArrowBackCircleSharp size={30} /> Regresar
+            </button>
           </div>
           <div className="card-body p-5 bg-light">
             {resultados.length === 0 ? <div className="alert alert-warning">El alumno no ha completado el cuestionario.</div> : (
