@@ -259,7 +259,7 @@ const ResultadosGruposAdmin = () => {
                                 <div className="bg-white p-4 rounded border shadow-sm text-center mt-4 border-top border-3 border-primary">
                                   <h6 className="fw-bold mb-3">Esta sección contiene {openQuestions.length} pregunta(s) abierta(s)</h6>
                                   <button
-                                    className="btn btn-primary px-4 py-2 fw-bold"
+                                    className="btn border-0 bg-transparent text-primary fw-bold fs-5"
                                     onClick={() => setModalAlumnosOpen(true)}
                                   >
                                     <i className="bi bi-people-fill me-2"></i>
@@ -269,20 +269,37 @@ const ResultadosGruposAdmin = () => {
                               )}
 
                               {/* Controles de paginación */}
-                              <div className="d-flex justify-content-between mt-5">
+                              <div className="d-flex justify-content-between align-items-center mt-5 flex-wrap gap-3">
                                 <button 
-                                  className="btn btn-outline-primary fw-bold px-4" 
+                                  className="btn border-0 bg-transparent text-primary fw-bold px-3" 
                                   onClick={handlePrevSection} 
                                   disabled={currentSectionIndex === 0}
                                 >
-                                  <i className="bi bi-chevron-left me-2"></i> Anterior
+                                  <i className="bi bi-chevron-left me-1"></i> Anterior
                                 </button>
+                                
+                                <div className="d-flex flex-wrap gap-2 justify-content-center">
+                                  {resultados.map((_, idx) => (
+                                    <button
+                                      key={idx}
+                                      className={`btn rounded-circle fw-bold d-flex justify-content-center align-items-center ${currentSectionIndex === idx ? 'btn-primary text-white shadow' : 'btn-light text-secondary border'}`}
+                                      style={{ width: '45px', height: '45px' }}
+                                      onClick={() => {
+                                        setCurrentSectionIndex(idx);
+                                        window.scrollTo(0, 0);
+                                      }}
+                                    >
+                                      {idx + 1}
+                                    </button>
+                                  ))}
+                                </div>
+
                                 <button 
-                                  className="btn btn-primary fw-bold px-4" 
+                                  className="btn border-0 bg-transparent text-primary fw-bold px-3" 
                                   onClick={handleNextSection} 
                                   disabled={currentSectionIndex === resultados.length - 1}
                                 >
-                                  Siguiente <i className="bi bi-chevron-right ms-2"></i>
+                                  Siguiente <i className="bi bi-chevron-right ms-1"></i>
                                 </button>
                               </div>
                             </>
