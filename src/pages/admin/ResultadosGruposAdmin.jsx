@@ -5,6 +5,8 @@ import logo from '../../assets/itl_leon.png';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import DetalleResumenAdminModal from '../../components/modals/DetalleResumenAdminModal';
 import { IoArrowBackCircleSharp } from 'react-icons/io5';
+import ListaAlumnosModal from '../../components/modals/ListaAlumnosModal';
+import RespuestasAbiertasModal from '../../components/modals/RespuestasAbiertasModal';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -22,9 +24,16 @@ const ResultadosGruposAdmin = () => {
 
   // Datos
   const [grupos, setGrupos] = useState([]);
-  const [selectedGrupo, setSelectedGrupo] = useState(null); // null = mostrar tarjetas, {...} = mostrar gráficas
+  const [selectedGrupo, setSelectedGrupo] = useState(null);
   const [resultados, setResultados] = useState([]);
-  const [modalData, setModalData] = useState(null);
+  const [alumnosGrupo, setAlumnosGrupo] = useState([]);
+  
+  // Paginación de secciones
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+
+  // Modales
+  const [modalAlumnosOpen, setModalAlumnosOpen] = useState(false);
+  const [selectedAlumno, setSelectedAlumno] = useState(null);
 
   // 1. Cargar filtros iniciales
   useEffect(() => {
@@ -75,17 +84,38 @@ const ResultadosGruposAdmin = () => {
       setLoadingResultados(true);
       try {
         const res = await administrativosService.getResultadosPorGrupo(selectedCarrera, selectedPeriodo, selectedGrupo.indice_grupo);
-        if (res.success) setResultados(res.data);
-        else setResultados([]);
+        if (res.success && res.data) {
+          setResultados(res.data.frecuencias || []);
+          setAlumnosGrupo(res.data.alumnos || []);
+          setCurrentSectionIndex(0);
+        } else {
+          setResultados([]);
+          setAlumnosGrupo([]);
+        }
       } catch (error) {
         console.error("Error cargando resultados por grupo:", error);
         setResultados([]);
+        setAlumnosGrupo([]);
       } finally {
         setLoadingResultados(false);
       }
     };
     fetchResultados();
   }, [selectedGrupo, selectedCarrera, selectedPeriodo]);
+
+  const handleNextSection = () => {
+    if (currentSectionIndex < resultados.length - 1) {
+      setCurrentSectionIndex(currentSectionIndex + 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handlePrevSection = () => {
+    if (currentSectionIndex > 0) {
+      setCurrentSectionIndex(currentSectionIndex - 1);
+      window.scrollTo(0, 0);
+    }
+  };
 
   if (loadingFiltros) return <div className="d-flex justify-content-center align-items-center min-vh-100 bg-tec-full"><div className="spinner-border text-white"></div></div>;
 
@@ -184,54 +214,82 @@ const ResultadosGruposAdmin = () => {
                   <div className="alert alert-warning text-center">Nadie en este grupo ha contestado el cuestionario aún</div>
                 ) : (
                   <div className="row g-4">
-                    {resultados.map((seccion) => {
-                      const showChart = seccion.id_seccion !== 2 && seccion.id_seccion !== 3;
+                    {resultados.length > 0 && (
+                      <div className="col-12 mb-5">
+                        {(() => {
+                          const seccion = resultados[currentSectionIndex];
+                          const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha'));
+                          const openQuestions = seccion.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha'));
 
-                      return (
-                        <div key={seccion.id_seccion} className="col-12 mb-5">
-                          <h4 className="fw-bold text-dark border-start border-5 border-info ps-3 mb-4">
-                            {seccion.nombre}
-                          </h4>
+                          return (
+                            <>
+                              <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h4 className="fw-bold text-dark border-start border-5 border-info ps-3 mb-0">
+                                  {seccion.nombre}
+                                </h4>
+                                <span className="badge bg-secondary">Sección {currentSectionIndex + 1} de {resultados.length}</span>
+                              </div>
 
-                          {showChart ? (
-                            <div className="row">
-                              {seccion.preguntas.map((pregunta) => (
-                                <div key={pregunta.id_pregunta} className="col-md-6 mb-4">
-                                  <div className="bg-white p-3 rounded border shadow-sm h-100">
-                                    <h6 className="fw-bold text-secondary mb-3">{pregunta.pregunta}</h6>
-                                    <div style={{ height: 250 }}>
-                                      <ResponsiveContainer>
-                                        <BarChart data={pregunta.opciones} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                          <XAxis dataKey="opcion" tick={{ fontSize: 10 }} interval={0} angle={-15} textAnchor="end" />
-                                          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                                          <Tooltip cursor={{ fill: '#f0f0f0' }} />
-                                          <Bar dataKey="cantidad" name="Votos" radius={[4, 4, 0, 0]}>
-                                            {pregunta.opciones.map((entry, index) => (
-                                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                          </Bar>
-                                        </BarChart>
-                                      </ResponsiveContainer>
+                              <div className="row">
+                                {closedQuestions.map((pregunta) => (
+                                  <div key={pregunta.id_pregunta} className="col-md-6 mb-4">
+                                    <div className="bg-white p-3 rounded border shadow-sm h-100">
+                                      <h6 className="fw-bold text-secondary mb-3">{pregunta.pregunta}</h6>
+                                      <div style={{ height: 250 }}>
+                                        <ResponsiveContainer>
+                                          <BarChart data={pregunta.opciones} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="opcion" tick={{ fontSize: 10 }} interval={0} angle={-15} textAnchor="end" />
+                                            <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                                            <Tooltip cursor={{ fill: '#f0f0f0' }} />
+                                            <Bar dataKey="cantidad" name="Votos" radius={[4, 4, 0, 0]}>
+                                              {pregunta.opciones.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                              ))}
+                                            </Bar>
+                                          </BarChart>
+                                        </ResponsiveContainer>
+                                      </div>
                                     </div>
                                   </div>
+                                ))}
+                              </div>
+
+                              {openQuestions.length > 0 && (
+                                <div className="bg-white p-4 rounded border shadow-sm text-center mt-4 border-top border-3 border-primary">
+                                  <h6 className="fw-bold mb-3">Esta sección contiene {openQuestions.length} pregunta(s) abierta(s)</h6>
+                                  <button
+                                    className="btn btn-primary px-4 py-2 fw-bold"
+                                    onClick={() => setModalAlumnosOpen(true)}
+                                  >
+                                    <i className="bi bi-people-fill me-2"></i>
+                                    Ver respuestas abiertas por alumno
+                                  </button>
                                 </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="bg-white p-4 rounded border shadow-sm text-center">
-                              <button
-                                className="btn border-0 bg-transparent text-primary"
-                                onClick={() => setModalData(seccion)}
-                              >
-                                <i className="bi bi-eye-fill me-2"></i>
-                                Ver detalles
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                              )}
+
+                              {/* Controles de paginación */}
+                              <div className="d-flex justify-content-between mt-5">
+                                <button 
+                                  className="btn btn-outline-primary fw-bold px-4" 
+                                  onClick={handlePrevSection} 
+                                  disabled={currentSectionIndex === 0}
+                                >
+                                  <i className="bi bi-chevron-left me-2"></i> Anterior
+                                </button>
+                                <button 
+                                  className="btn btn-primary fw-bold px-4" 
+                                  onClick={handleNextSection} 
+                                  disabled={currentSectionIndex === resultados.length - 1}
+                                >
+                                  Siguiente <i className="bi bi-chevron-right ms-2"></i>
+                                </button>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -239,10 +297,25 @@ const ResultadosGruposAdmin = () => {
           </div>
         </div>
 
-        <DetalleResumenAdminModal
-          modalData={modalData}
-          onClose={() => setModalData(null)}
-        />
+        {modalAlumnosOpen && (
+          <ListaAlumnosModal
+            alumnos={alumnosGrupo}
+            seccionNombre={resultados[currentSectionIndex]?.nombre}
+            onClose={() => setModalAlumnosOpen(false)}
+            onSelectAlumno={(alum) => {
+              setSelectedAlumno(alum);
+            }}
+          />
+        )}
+
+        {selectedAlumno && (
+          <RespuestasAbiertasModal
+            alumno={selectedAlumno}
+            seccionId={resultados[currentSectionIndex]?.id_seccion}
+            seccionNombre={resultados[currentSectionIndex]?.nombre}
+            onClose={() => setSelectedAlumno(null)}
+          />
+        )}
 
       </div>
     </div>

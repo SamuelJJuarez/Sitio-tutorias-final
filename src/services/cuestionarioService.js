@@ -41,5 +41,13 @@ export const cuestionarioService = {
       headers: getAuthHeaders()
     });
     return await response.json();
+  },
+
+  getResultadosPorAlumnoId: async (num_control) => {
+    const response = await fetch(`${API_URL}/resultados/${num_control}`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+    return await response.json();
   }
 };
