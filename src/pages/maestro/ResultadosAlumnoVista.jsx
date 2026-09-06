@@ -95,9 +95,7 @@ const ResultadosAlumnoVista = () => {
                 <small className="text-muted">{num_control}</small>
               </div>
             </div>
-            <button className="btn border-0 bg-transparent text-tec d-flex align-items-center gap-2" onClick={() => navigate(-1)}>
-              <IoArrowBackCircleSharp size={30} /> Regresar
-            </button>
+            <button className="btn border-0 bg-transparent text-tec d-flex align-items-center gap-2" onClick={() => navigate(-1)}> <IoArrowBackCircleSharp size={30} /> Regresar</button>
           </div>
           <div className="card-body p-5 bg-light">
             {resultados.length === 0 ? <div className="alert alert-warning">El alumno no ha completado el cuestionario.</div> : (
