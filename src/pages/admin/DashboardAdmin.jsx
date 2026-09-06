@@ -15,7 +15,7 @@ const DashboardAdmin = () => {
       </h2>
 
       <div className="row g-5 justify-content-center w-100" style={{ maxWidth: '1000px' }}>
-        {/* Tarjeta Resumen General */}
+        {/* Tarjeta Resultados por Carrera */}
         <div className="col-md-4">
           <div
             className="card shadow h-100 text-center p-4 card-custom cursor-pointer zoom-effect border-0"
@@ -26,8 +26,8 @@ const DashboardAdmin = () => {
           >
             <div className="card-body">
               <FaClipboardList className="display-1 text-primary mb-3" size={80} />
-              <h3 className="card-title fw-bold text-dark">Resumen general</h3>
-              <p className="card-text text-muted">Consulta los resultados generales</p>
+              <h3 className="card-title fw-bold text-dark">Resultados por carrera</h3>
+              <p className="card-text text-muted">Consulta los resultados por carrera</p>
             </div>
           </div>
         </div>
