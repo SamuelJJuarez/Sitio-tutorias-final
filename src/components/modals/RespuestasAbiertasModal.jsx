@@ -4,6 +4,7 @@ import { cuestionarioService } from '../../services/cuestionarioService';
 const RespuestasAbiertasModal = ({ alumno, seccionId, seccionNombre, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [respuestasAbiertas, setRespuestasAbiertas] = useState([]);
+  const [seccionNoContestada, setSeccionNoContestada] = useState(false);
 
   useEffect(() => {
     const fetchRespuestas = async () => {
@@ -11,15 +12,18 @@ const RespuestasAbiertasModal = ({ alumno, seccionId, seccionNombre, onClose }) 
       try {
         const res = await cuestionarioService.getResultadosPorAlumnoId(alumno.num_control_alum);
         if (res.success && res.data) {
-          // Filtrar la sección solicitada
-          const seccion = res.data.find(s => s.id_seccion === seccionId);
+          const seccion = res.data.find(s => s.id_seccion == seccionId);
           if (seccion && seccion.respuestas) {
+            setSeccionNoContestada(false);
             // Filtrar solo las respuestas abiertas (Abierta_Corta, Abierta_Larga, Fecha)
-            const abiertas = seccion.respuestas.filter(r => 
-              r.tipo_resp && (r.tipo_resp.startsWith('Abierta') || r.tipo_resp === 'Fecha')
-            );
+            const abiertas = seccion.respuestas.filter(r => {
+              if (!r.tipo_resp) return false;
+              const type = r.tipo_resp.trim().toLowerCase();
+              return type.startsWith('abierta') || type === 'fecha';
+            });
             setRespuestasAbiertas(abiertas);
           } else {
+            setSeccionNoContestada(true);
             setRespuestasAbiertas([]);
           }
         }
@@ -51,6 +55,8 @@ const RespuestasAbiertasModal = ({ alumno, seccionId, seccionNombre, onClose }) 
                 <div className="spinner-border text-primary" role="status"></div>
                 <p className="mt-3 text-muted">Cargando respuestas...</p>
               </div>
+            ) : seccionNoContestada ? (
+              <div className="alert alert-warning text-center">El alumno aún no ha contestado esta sección del cuestionario.</div>
             ) : respuestasAbiertas.length === 0 ? (
               <div className="alert alert-info text-center">El alumno no proporcionó respuestas abiertas para esta sección.</div>
             ) : (
@@ -61,7 +67,7 @@ const RespuestasAbiertasModal = ({ alumno, seccionId, seccionNombre, onClose }) 
                       {resp.pregunta}
                     </h6>
                     <p className="text-secondary mb-0 p-3 bg-light rounded border">
-                      {resp.respuesta_elegida && resp.respuesta_elegida.trim() !== '' ? (
+                      {resp.respuesta_elegida && String(resp.respuesta_elegida).trim() !== '' ? (
                         resp.respuesta_elegida
                       ) : (
                         <span className="fst-italic text-muted">Sin respuesta</span>
