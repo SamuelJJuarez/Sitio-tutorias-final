@@ -45,6 +45,15 @@ export const administrativosService = {
     return await response.json();
   },
 
+  getResultadosSemestre: async (periodo) => {
+    const params = new URLSearchParams({ periodo });
+    const response = await fetch(`${API_URL}/resultados/semestre?${params.toString()}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    return await response.json();
+  },
+
   getResultadosPorGrupo: async (carrera, periodo, indice_grupo) => {
     const params = new URLSearchParams({ carrera, periodo, indice_grupo });
     const response = await fetch(`${API_URL}/resultados/grupo?${params.toString()}`, {

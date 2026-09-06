@@ -25,6 +25,7 @@ import ResultadosAlumnoVista from './pages/maestro/ResultadosAlumnoVista';
 import DashboardAdmin from './pages/admin/DashboardAdmin';
 import ResultadosGeneralesAdmin from './pages/admin/ResultadosGeneralesAdmin';
 import ResultadosGruposAdmin from './pages/admin/ResultadosGruposAdmin';
+import ResultadosSemestreAdmin from './pages/admin/ResultadosSemestreAdmin';
 import CrearGruposAdmin from './pages/admin/CrearGruposAdmin';
 
 // --- COMPONENTE DE RUTA PROTEGIDA ---
@@ -118,6 +119,7 @@ function App() {
                     <Route path="dashboard" element={<DashboardAdmin />} />
                     <Route path="resultados/generales" element={<ResultadosGeneralesAdmin />} />
                     <Route path="resultados/grupos" element={<ResultadosGruposAdmin />} />
+                    <Route path="resultados/semestre" element={<ResultadosSemestreAdmin />} />
                     <Route path="crear-grupos" element={<CrearGruposAdmin />} />
                     <Route path="*" element={<Navigate to="dashboard" />} />
                   </Routes>

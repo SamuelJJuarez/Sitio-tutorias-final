@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FaClipboardList, FaChartLine, FaUsersCog } from 'react-icons/fa';
+import { FaClipboardList, FaChartLine, FaUsersCog, FaChartPie } from 'react-icons/fa';
 
 const DashboardAdmin = () => {
   const { user } = useAuth();
@@ -45,6 +45,23 @@ const DashboardAdmin = () => {
               <FaChartLine className="display-1 text-info mb-3" size={80} />
               <h3 className="card-title fw-bold text-dark">Resultados por grupo</h3>
               <p className="card-text text-muted">Consulta el diagnóstico por grupos específicos</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tarjeta Resultados por Semestre */}
+        <div className="col-md-4">
+          <div
+            className="card shadow h-100 text-center p-4 card-custom cursor-pointer zoom-effect border-0"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate('/admin/resultados/semestre')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/admin/resultados/semestre'); }}
+          >
+            <div className="card-body">
+              <FaChartPie className="display-1 text-success mb-3" size={80} />
+              <h3 className="card-title fw-bold text-dark">Resultados por semestre</h3>
+              <p className="card-text text-muted">Consulta los resultados globales de un periodo</p>
             </div>
           </div>
         </div>
