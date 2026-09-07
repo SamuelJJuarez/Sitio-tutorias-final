@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { administrativosService } from '../../services/administrativosService';
 import logo from '../../assets/itl_leon.png';
@@ -120,10 +120,12 @@ const ResultadosSemestreAdmin = () => {
               <div className="row g-4">
                 {(() => {
                   const seccion = resultados[currentSectionIndex];
-                  if (!seccion) return null;
+                  const closedQuestions = useMemo(() => {
+                    if (!seccion) return [];
+                    return seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
+                  }, [seccion]);
 
-                  // Filtrar las preguntas abiertas
-                  const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
+                  if (!seccion) return null;
 
                   return (
                     <div className="col-12 mb-5">

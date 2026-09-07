@@ -1,32 +1,33 @@
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import MainLayout from './components/common/MainLayout';
 
-// --- VISTAS PÚBLICAS ---
-import LoginPage from './pages/LoginPage';
-import RegisterAlumnoPage from './pages/auth/RegisterAlumnoPage';
-import RegisterMaestroPage from './pages/auth/RegisterMaestroPage';
-import RegisterAdminPage from './pages/auth/RegisterAdminPage';
-import VerifyEmailPage from './pages/auth/VerifyEmailPage';
-import VerifyPasswordPage from './pages/auth/VerifyPasswordPage';
-import ResponderEntrevistaPage from './pages/auth/ResponderEntrevistaPage';
+// --- VISTAS PÚBLICAS (Lazy Loading) ---
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const RegisterAlumnoPage = React.lazy(() => import('./pages/auth/RegisterAlumnoPage'));
+const RegisterMaestroPage = React.lazy(() => import('./pages/auth/RegisterMaestroPage'));
+const RegisterAdminPage = React.lazy(() => import('./pages/auth/RegisterAdminPage'));
+const VerifyEmailPage = React.lazy(() => import('./pages/auth/VerifyEmailPage'));
+const VerifyPasswordPage = React.lazy(() => import('./pages/auth/VerifyPasswordPage'));
+const ResponderEntrevistaPage = React.lazy(() => import('./pages/auth/ResponderEntrevistaPage'));
 
-// --- VISTAS ALUMNO ---
-import DashboardAlumno from './pages/alumno/DashboardAlumno';
-import CuestionarioPage from './pages/alumno/CuestionarioPage';
-import ResultadosAlumnoPage from './pages/alumno/ResultadosAlumnoPage';
+// --- VISTAS ALUMNO (Lazy Loading) ---
+const DashboardAlumno = React.lazy(() => import('./pages/alumno/DashboardAlumno'));
+const CuestionarioPage = React.lazy(() => import('./pages/alumno/CuestionarioPage'));
+const ResultadosAlumnoPage = React.lazy(() => import('./pages/alumno/ResultadosAlumnoPage'));
 
-// --- VISTAS MAESTRO ---
-import DashboardMaestro from './pages/maestro/DashboardMaestro';
-import ListaAlumnosPage from './pages/maestro/ListaAlumnosPage';
-import ResultadosAlumnoVista from './pages/maestro/ResultadosAlumnoVista';
+// --- VISTAS MAESTRO (Lazy Loading) ---
+const DashboardMaestro = React.lazy(() => import('./pages/maestro/DashboardMaestro'));
+const ListaAlumnosPage = React.lazy(() => import('./pages/maestro/ListaAlumnosPage'));
+const ResultadosAlumnoVista = React.lazy(() => import('./pages/maestro/ResultadosAlumnoVista'));
 
-// --- VISTAS ADMIN ---
-import DashboardAdmin from './pages/admin/DashboardAdmin';
-import ResultadosGeneralesAdmin from './pages/admin/ResultadosGeneralesAdmin';
-import ResultadosGruposAdmin from './pages/admin/ResultadosGruposAdmin';
-import ResultadosSemestreAdmin from './pages/admin/ResultadosSemestreAdmin';
-import CrearGruposAdmin from './pages/admin/CrearGruposAdmin';
+// --- VISTAS ADMIN (Lazy Loading) ---
+const DashboardAdmin = React.lazy(() => import('./pages/admin/DashboardAdmin'));
+const ResultadosGeneralesAdmin = React.lazy(() => import('./pages/admin/ResultadosGeneralesAdmin'));
+const ResultadosGruposAdmin = React.lazy(() => import('./pages/admin/ResultadosGruposAdmin'));
+const ResultadosSemestreAdmin = React.lazy(() => import('./pages/admin/ResultadosSemestreAdmin'));
+const CrearGruposAdmin = React.lazy(() => import('./pages/admin/CrearGruposAdmin'));
 
 // --- COMPONENTE DE RUTA PROTEGIDA ---
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -45,93 +46,100 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+// --- SPINNER DE CARGA PEREZOSA ---
+const SuspenseFallback = () => (
+  <div className="d-flex justify-content-center align-items-center min-vh-100">
+    <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }}></div>
+  </div>
+);
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
+        <Suspense fallback={<SuspenseFallback />}>
+          <Routes>
+            {/* ==============================
+                RUTAS PÚBLICAS
+            =============================== */}
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/registro-alumno" element={<RegisterAlumnoPage />} />
+            <Route path="/registro-maestro" element={<RegisterMaestroPage />} />
+            <Route path="/registro-admin" element={<RegisterAdminPage />} />
+            <Route path="/verificar-correo" element={<VerifyEmailPage />} />
+            <Route path="/verificar-password" element={<VerifyPasswordPage />} />
+            <Route path="/responder-entrevista" element={<ResponderEntrevistaPage />} />
 
-          {/* ==============================
-              RUTAS PÚBLICAS
-          =============================== */}
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/registro-alumno" element={<RegisterAlumnoPage />} />
-          <Route path="/registro-maestro" element={<RegisterMaestroPage />} />
-          <Route path="/registro-admin" element={<RegisterAdminPage />} />
-          <Route path="/verificar-correo" element={<VerifyEmailPage />} />
-          <Route path="/verificar-password" element={<VerifyPasswordPage />} />
-          <Route path="/responder-entrevista" element={<ResponderEntrevistaPage />} />
+            {/* ==============================
+                RUTAS PROTEGIDAS: ALUMNO
+            =============================== */}
+            <Route
+              path="/alumno/*"
+              element={
+                <ProtectedRoute allowedRoles={['alumno']}>
+                  <MainLayout>
+                    <Routes>
+                      {/* Menú Principal */}
+                      <Route path="dashboard" element={<DashboardAlumno />} />
 
-          {/* ==============================
-              RUTAS PROTEGIDAS: ALUMNO
-          =============================== */}
-          <Route
-            path="/alumno/*"
-            element={
-              <ProtectedRoute allowedRoles={['alumno']}>
-                <MainLayout>
-                  <Routes>
-                    {/* Menú Principal */}
-                    <Route path="dashboard" element={<DashboardAlumno />} />
+                      {/* El Cuestionario (Wizard) */}
+                      <Route path="cuestionario" element={<CuestionarioPage />} />
 
-                    {/* El Cuestionario (Wizard) */}
-                    <Route path="cuestionario" element={<CuestionarioPage />} />
+                      {/* Las Gráficas */}
+                      <Route path="resultados" element={<ResultadosAlumnoPage />} />
 
-                    {/* Las Gráficas */}
-                    <Route path="resultados" element={<ResultadosAlumnoPage />} />
+                      {/* Si ponen una ruta loca (ej: /alumno/blabla), regresar al dashboard */}
+                      <Route path="*" element={<Navigate to="dashboard" />} />
+                    </Routes>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
 
-                    {/* Si ponen una ruta loca (ej: /alumno/blabla), regresar al dashboard */}
-                    <Route path="*" element={<Navigate to="dashboard" />} />
-                  </Routes>
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
+            {/* ==============================
+                RUTAS PROTEGIDAS: MAESTRO
+            =============================== */}
+            <Route
+              path="/maestro/*"
+              element={
+                <ProtectedRoute allowedRoles={['maestro']}>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="dashboard" element={<DashboardMaestro />} />
+                      <Route path="grupo/:indice_grupo" element={<ListaAlumnosPage />} />
+                      <Route path="resultados/:num_control" element={<ResultadosAlumnoVista />} />
+                      <Route path="*" element={<Navigate to="dashboard" />} />
+                    </Routes>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* ==============================
-              RUTAS PROTEGIDAS: MAESTRO
-          =============================== */}
-          <Route
-            path="/maestro/*"
-            element={
-              <ProtectedRoute allowedRoles={['maestro']}>
-                <MainLayout>
-                  <Routes>
-                    <Route path="dashboard" element={<DashboardMaestro />} />
-                    <Route path="grupo/:indice_grupo" element={<ListaAlumnosPage />} />
-                    <Route path="resultados/:num_control" element={<ResultadosAlumnoVista />} />
-                    <Route path="*" element={<Navigate to="dashboard" />} />
-                  </Routes>
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
+            {/* ==============================
+                RUTAS PROTEGIDAS: ADMIN
+            =============================== */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'administrativo']}>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="dashboard" element={<DashboardAdmin />} />
+                      <Route path="resultados/generales" element={<ResultadosGeneralesAdmin />} />
+                      <Route path="resultados/grupos" element={<ResultadosGruposAdmin />} />
+                      <Route path="resultados/semestre" element={<ResultadosSemestreAdmin />} />
+                      <Route path="crear-grupos" element={<CrearGruposAdmin />} />
+                      <Route path="*" element={<Navigate to="dashboard" />} />
+                    </Routes>
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* ==============================
-              RUTAS PROTEGIDAS: ADMIN
-          =============================== */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'administrativo']}>
-                <MainLayout>
-                  <Routes>
-                    <Route path="dashboard" element={<DashboardAdmin />} />
-                    <Route path="resultados/generales" element={<ResultadosGeneralesAdmin />} />
-                    <Route path="resultados/grupos" element={<ResultadosGruposAdmin />} />
-                    <Route path="resultados/semestre" element={<ResultadosSemestreAdmin />} />
-                    <Route path="crear-grupos" element={<CrearGruposAdmin />} />
-                    <Route path="*" element={<Navigate to="dashboard" />} />
-                  </Routes>
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Ruta por defecto para cualquier cosa no definida (Error 404 -> Login) */}
-          <Route path="*" element={<Navigate to="/" />} />
-
-        </Routes>
+            {/* Ruta por defecto para cualquier cosa no definida (Error 404 -> Login) */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </AuthProvider>
   );

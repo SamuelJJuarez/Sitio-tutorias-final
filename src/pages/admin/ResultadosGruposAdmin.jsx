@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { administrativosService } from '../../services/administrativosService';
 import logo from '../../assets/itl_leon.png';
@@ -218,8 +218,13 @@ const ResultadosGruposAdmin = () => {
                       <div className="col-12 mb-5">
                         {(() => {
                           const seccion = resultados[currentSectionIndex];
-                          const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
-                          const openQuestions = seccion.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha' || p.tipo_resp === 'Numero'));
+                          const { closedQuestions, openQuestions } = useMemo(() => {
+                            if (!seccion) return { closedQuestions: [], openQuestions: [] };
+                            return {
+                              closedQuestions: seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero')),
+                              openQuestions: seccion.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha' || p.tipo_resp === 'Numero'))
+                            };
+                          }, [seccion]);
 
                           return (
                             <>
