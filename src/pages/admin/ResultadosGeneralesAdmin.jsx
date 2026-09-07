@@ -136,7 +136,7 @@ const ResultadosGeneralesAdmin = () => {
                   if (!seccion) return null;
 
                   // Filtrar las preguntas abiertas
-                  const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha'));
+                  const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
 
                   return (
                     <div className="col-12 mb-5">

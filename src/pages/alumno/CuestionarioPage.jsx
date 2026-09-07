@@ -164,6 +164,23 @@ const CuestionarioPage = () => {
             />
           </div>
         );
+      case 'Numero':
+        return (
+          <div className="col-12 col-md-6 col-lg-4">
+            <input
+              type="text"
+              className={`form-control form-control-lg shadow-sm ${isDisabled ? 'bg-light text-muted' : 'border-primary'}`}
+              maxLength={15}
+              value={valorActual || ''}
+              onChange={(e) => {
+                const numericValue = e.target.value.replace(/\D/g, '');
+                handleOptionSelect(preg.id_pregunta, numericValue);
+              }}
+              placeholder={placeholderMsg || "Ingresa solo números"}
+              disabled={isDisabled}
+            />
+          </div>
+        );
       case 'Scroll':
         return (
           <div className="col-12 col-md-6 col-lg-4">

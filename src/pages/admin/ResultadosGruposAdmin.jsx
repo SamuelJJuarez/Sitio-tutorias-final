@@ -218,8 +218,8 @@ const ResultadosGruposAdmin = () => {
                       <div className="col-12 mb-5">
                         {(() => {
                           const seccion = resultados[currentSectionIndex];
-                          const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha'));
-                          const openQuestions = seccion.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha'));
+                          const closedQuestions = seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
+                          const openQuestions = seccion.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha' || p.tipo_resp === 'Numero'));
 
                           return (
                             <>

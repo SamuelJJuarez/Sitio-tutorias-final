@@ -15,11 +15,11 @@ const RespuestasAbiertasModal = ({ alumno, seccionId, seccionNombre, onClose }) 
           const seccion = res.data.find(s => s.id_seccion == seccionId);
           if (seccion && seccion.respuestas) {
             setSeccionNoContestada(false);
-            // Filtrar solo las respuestas abiertas (Abierta_Corta, Abierta_Larga, Fecha)
+            // Filtrar solo las respuestas abiertas (Abierta_Corta, Abierta_Larga, Fecha, Numero)
             const abiertas = seccion.respuestas.filter(r => {
               if (!r.tipo_resp) return false;
               const type = r.tipo_resp.trim().toLowerCase();
-              return type.startsWith('abierta') || type === 'fecha';
+              return type.startsWith('abierta') || type === 'fecha' || type === 'numero';
             });
             setRespuestasAbiertas(abiertas);
           } else {
