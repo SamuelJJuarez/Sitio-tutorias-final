@@ -81,6 +81,12 @@ const ResultadosGeneralesAdmin = () => {
     }
   };
 
+  const seccionMemo = resultados[currentSectionIndex];
+  const closedQuestions = useMemo(() => {
+    if (!seccionMemo) return [];
+    return seccionMemo.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
+  }, [seccionMemo]);
+
   if (loadingFiltros) return <div className="d-flex justify-content-center align-items-center min-vh-100 bg-tec-full"><div className="spinner-border text-white"></div></div>;
 
   return (
@@ -133,10 +139,6 @@ const ResultadosGeneralesAdmin = () => {
               <div className="row g-4">
                 {(() => {
                   const seccion = resultados[currentSectionIndex];
-                  const closedQuestions = useMemo(() => {
-                    if (!seccion) return [];
-                    return seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero'));
-                  }, [seccion]);
 
                   if (!seccion) return null;
 

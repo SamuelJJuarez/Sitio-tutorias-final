@@ -117,6 +117,15 @@ const ResultadosGruposAdmin = () => {
     }
   };
 
+  const seccionMemo = resultados[currentSectionIndex];
+  const { closedQuestions, openQuestions } = useMemo(() => {
+    if (!seccionMemo) return { closedQuestions: [], openQuestions: [] };
+    return {
+      closedQuestions: seccionMemo.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero')),
+      openQuestions: seccionMemo.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha' || p.tipo_resp === 'Numero'))
+    };
+  }, [seccionMemo]);
+
   if (loadingFiltros) return <div className="d-flex justify-content-center align-items-center min-vh-100 bg-tec-full"><div className="spinner-border text-white"></div></div>;
 
   return (
@@ -218,13 +227,6 @@ const ResultadosGruposAdmin = () => {
                       <div className="col-12 mb-5">
                         {(() => {
                           const seccion = resultados[currentSectionIndex];
-                          const { closedQuestions, openQuestions } = useMemo(() => {
-                            if (!seccion) return { closedQuestions: [], openQuestions: [] };
-                            return {
-                              closedQuestions: seccion.preguntas.filter(p => !p.tipo_resp || (!p.tipo_resp.startsWith('Abierta') && p.tipo_resp !== 'Fecha' && p.tipo_resp !== 'Numero')),
-                              openQuestions: seccion.preguntas.filter(p => p.tipo_resp && (p.tipo_resp.startsWith('Abierta') || p.tipo_resp === 'Fecha' || p.tipo_resp === 'Numero'))
-                            };
-                          }, [seccion]);
 
                           return (
                             <>
