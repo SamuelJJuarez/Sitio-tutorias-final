@@ -5,6 +5,7 @@ import SuccessModal from '../../components/modals/SuccessModal';
 import AlertModal from '../../components/modals/AlertModal';
 import { IoArrowBackCircleSharp } from 'react-icons/io5';
 import logo from '../../assets/itl_leon.png';
+import Select from 'react-select';
 
 const CrearGruposAdmin = () => {
   const navigate = useNavigate();
@@ -160,6 +161,11 @@ const CrearGruposAdmin = () => {
     }
   };
 
+  const maestrosOptions = maestros.map(m => ({
+    value: m.num_control_prof,
+    label: `${m.nombre} ${m.apellidoP} ${m.apellidoM}`
+  }));
+
   return (
     <div className="bg-tec-full min-vh-100 p-4 pt-5">
       <div className="container" style={{ maxWidth: '1200px' }}>
@@ -269,18 +275,21 @@ const CrearGruposAdmin = () => {
                     </div>
                     <div className="col-md-5">
                       <label className="form-label fw-bold" style={{ fontSize: '0.9rem' }}>Maestro asignado</label>
-                      <select
-                        className="form-select"
-                        value={fila.num_control_prof}
-                        onChange={(e) => handleFilaChange(index, 'num_control_prof', e.target.value)}
-                      >
-                        <option value="">Seleccione maestro...</option>
-                        {maestros.map(m => (
-                          <option key={m.num_control_prof} value={m.num_control_prof}>
-                            {m.nombre} {m.apellidoP} {m.apellidoM}
-                          </option>
-                        ))}
-                      </select>
+                      <Select
+                        options={maestrosOptions}
+                        value={maestrosOptions.find(opt => opt.value === fila.num_control_prof) || null}
+                        onChange={(selectedOption) => handleFilaChange(index, 'num_control_prof', selectedOption ? selectedOption.value : '')}
+                        placeholder="Buscar maestro..."
+                        isClearable
+                        noOptionsMessage={() => "No se encontraron maestros"}
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            minHeight: '38px',
+                            borderColor: '#dee2e6'
+                          })
+                        }}
+                      />
                     </div>
                   </div>
                 ))}
