@@ -46,7 +46,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
         frontendUrl: window.location.origin
       };
 
-      const res = await fetch(`https://api-sitio-tutorias.vercel.app/api/password/forgot`, {
+      const res = await fetch(`https://apitutoriasitl.vercel.app/api/password/forgot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend)
@@ -72,7 +72,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
           }
 
           try {
-            const statusRes = await fetch(`https://api-sitio-tutorias.vercel.app/api/verificacion/status/${registroId}`);
+            const statusRes = await fetch(`https://apitutoriasitl.vercel.app/api/verificacion/status/${registroId}`);
             const statusData = await statusRes.json();
 
             if (statusData.success && statusData.status === 'verified') {
