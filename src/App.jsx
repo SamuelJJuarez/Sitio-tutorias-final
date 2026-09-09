@@ -64,8 +64,8 @@ function App() {
             =============================== */}
             <Route path="/" element={<LoginPage />} />
             <Route path="/registro-alumno" element={<RegisterAlumnoPage />} />
-            <Route path="/registro-maestro" element={<RegisterMaestroPage />} />
-            <Route path="/registro-admin" element={<RegisterAdminPage />} />
+            <Route path="/registro-maestro-secure-5f8a9b" element={<RegisterMaestroPage />} />
+            <Route path="/registro-admin-secure-2d4c7e" element={<RegisterAdminPage />} />
             <Route path="/verificar-correo" element={<VerifyEmailPage />} />
             <Route path="/verificar-password" element={<VerifyPasswordPage />} />
             <Route path="/responder-entrevista" element={<ResponderEntrevistaPage />} />
